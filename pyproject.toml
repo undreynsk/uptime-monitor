@@ -1,0 +1,22 @@
+[project]
+name = "uptime-monitor"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "fastapi>=0.139.2",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.14.2",
+    "sqlalchemy[asyncio]>=2.0.51",
+    "uvicorn[standard]>=0.51.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.pytest.ini_options]
+# AM 20/Jul/26 - make the project root importable so tests can do "from app... import"
+pythonpath = ["."]
