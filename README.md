@@ -1,6 +1,6 @@
 # Uptime Monitor
 
-**English** | [Русский](README.ru.md)
+**English** | [Русский](README.ru.md) | [Deutsch](README.de.md)
 
 Asynchronous website uptime monitoring service built with **FastAPI** and **asyncio**.
 
@@ -120,8 +120,7 @@ All settings have defaults and can be overridden with environment variables:
 | `REQUEST_TIMEOUT_SECONDS` | `5` | httpx timeout for one request (applied per phase) |
 | `MAX_CONCURRENT_CHECKS` | `20` | Max checks running at the same time |
 | `CHECK_DEADLINE_SECONDS` | `15` | Hard deadline for one check — backstop above the httpx timeout |
-| `ROUND_TIMEOUT_SECONDS` | `120` | Hard deadline for a whole round |
-| `ROUND_TIMEOUT_SECONDS` | `120` | Hard limit for one whole round; on expiry the round is aborted and the scheduler continues |
+| `ROUND_TIMEOUT_SECONDS` | `120` | Hard deadline for a whole round; on expiry it is aborted and the scheduler continues |
 | `DATABASE_URL` | `sqlite+aiosqlite:///./monitor.db` | Database connection string |
 
 Example (Windows PowerShell):

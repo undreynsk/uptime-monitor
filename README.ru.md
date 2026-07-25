@@ -1,6 +1,6 @@
 # Uptime Monitor
 
-[English](README.md) | **Русский**
+[English](README.md) | **Русский** | [Deutsch](README.de.md)
 
 > Английская версия ([README.md](README.md)) — основная. Русская может немного отставать.
 
@@ -121,8 +121,7 @@ Round done: 6 checked, 4 down, took 5.02s
 | `REQUEST_TIMEOUT_SECONDS` | `5` | Таймаут httpx на один запрос (применяется по фазам) |
 | `MAX_CONCURRENT_CHECKS` | `20` | Максимум одновременных проверок |
 | `CHECK_DEADLINE_SECONDS` | `15` | Жёсткий дедлайн одной проверки — страховка поверх таймаута httpx |
-| `ROUND_TIMEOUT_SECONDS` | `120` | Жёсткий дедлайн всего раунда |
-| `ROUND_TIMEOUT_SECONDS` | `120` | Жёсткий лимит на весь раунд; при превышении раунд прерывается, планировщик продолжает работу |
+| `ROUND_TIMEOUT_SECONDS` | `120` | Жёсткий дедлайн всего раунда; при превышении раунд прерывается, планировщик продолжает работу |
 | `DATABASE_URL` | `sqlite+aiosqlite:///./monitor.db` | Строка подключения к базе |
 
 Пример (Windows PowerShell):
