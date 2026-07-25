@@ -27,7 +27,17 @@ async def _guarded_check(
     # "async with semaphore" waits for a free slot, then releases it on exit.
     # This limits concurrent NETWORK requests (sockets), nothing to do with the DB.
     async with semaphore:
-        outcome = await check_site(client, site.url)
+        try:
+            # AM 23/Jul/26 - hard per-check deadline (see config for why it is needed).
+            # Unlike the round-level timeout, which cancels the whole round, this one
+            # is turned into an ordinary "down" result: a single pathological site
+            # loses only its own check, the other sites still finish and get saved.
+            async with asyncio.timeout(settings.check_deadline_seconds):
+                outcome = await check_site(client, site.url)
+        except TimeoutError:
+            outcome = CheckOutcome(
+                is_up=False, status_code=None, response_time_ms=None, error="timeout"
+            )
     return site, outcome
 
 
@@ -95,7 +105,12 @@ async def run_monitor() -> None:
         # "except Exception" below does not swallow it -> shutdown stays clean.
         while True:
             try:
-                await _run_one_round(client, semaphore)
+                # AM 22/Jul/26 - hard deadline for the whole round. On expiry asyncio
+                # raises TimeoutError, which the handler below catches like any other
+                # round failure: log it and continue with the next round.
+                # External cancellation (shutdown) still propagates as CancelledError.
+                async with asyncio.timeout(settings.round_timeout_seconds):
+                    await _run_one_round(client, semaphore)
             except Exception:
                 # AM 22/Jul/26 - a single failed round must NOT kill the scheduler;
                 # log the traceback and keep going with the next round.
