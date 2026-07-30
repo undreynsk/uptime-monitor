@@ -1,0 +1,12 @@
+# AM 30/Jul/26 - keep the build context small and never copy host-specific or
+# generated files into the image
+.venv/
+**/__pycache__/
+*.db
+.pytest_cache/
+.git/
+.gitignore
+.vscode/
+tests/
+data/
+*.md

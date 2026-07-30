@@ -28,6 +28,7 @@
 | Валидация / настройки | Pydantic v2, pydantic-settings |
 | Тесты | pytest, pytest-asyncio |
 | Пакеты | uv |
+| Контейнеризация | Docker |
 
 ---
 
@@ -110,6 +111,33 @@ Round done: 6 checked, 4 down, took 5.02s
 
 ---
 
+## Запуск в Docker
+
+Собрать образ:
+
+```bash
+docker build -t uptime-monitor .
+```
+
+Один раз создать базу — в смонтированном томе, чтобы она переживала перезапуски:
+
+```bash
+docker run --rm -v ./data:/app/data uptime-monitor python -m app.installation
+```
+
+Запустить сервис (пробрасываем порт 8000 и том `./data`):
+
+```bash
+docker run -d -p 8000:8000 -v ./data:/app/data --name uptime uptime-monitor
+```
+
+Открой http://127.0.0.1:8000/docs. Логи — `docker logs -f uptime`, остановка —
+`docker stop uptime`. База лежит в томе `./data` (через `DATABASE_URL`), поэтому
+переживает перезапуск и удаление контейнера. На Docker Desktop (Windows/macOS) для
+базы named volume надёжнее, чем bind mount на папку хоста.
+
+---
+
 ## Настройки
 
 У всех настроек есть значения по умолчанию, их можно переопределить переменными
@@ -187,4 +215,3 @@ uv run pytest
 - `GET /sites/{id}/checks` — недавняя история проверок
 - `GET /sites/{id}/stats` — процент доступности и среднее время отклика за период
 - Модульные тесты для `check_site` через `httpx.MockTransport`
-- Docker-образ

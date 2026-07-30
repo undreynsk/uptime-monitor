@@ -29,6 +29,7 @@ Verlauf jeder Prüfung — Statuscode, Antwortzeit und ob die Website erreichbar
 | Validierung / Einstellungen | Pydantic v2, pydantic-settings |
 | Tests | pytest, pytest-asyncio |
 | Paketverwaltung | uv |
+| Containerisierung | Docker |
 
 ---
 
@@ -114,6 +115,33 @@ Round done: 6 checked, 4 down, took 5.02s
 
 ---
 
+## Mit Docker ausführen
+
+Image bauen:
+
+```bash
+docker build -t uptime-monitor .
+```
+
+Die Datenbank einmalig anlegen — in einem gemounteten Volume, damit sie Neustarts übersteht:
+
+```bash
+docker run --rm -v ./data:/app/data uptime-monitor python -m app.installation
+```
+
+Den Dienst starten (Port 8000 und das Volume `./data` werden durchgereicht):
+
+```bash
+docker run -d -p 8000:8000 -v ./data:/app/data --name uptime uptime-monitor
+```
+
+Öffne http://127.0.0.1:8000/docs. Logs mit `docker logs -f uptime`, stoppen mit
+`docker stop uptime`. Die Datenbank liegt im Volume `./data` (über `DATABASE_URL`) und
+übersteht so Neustart und Entfernen des Containers. Auf Docker Desktop (Windows/macOS)
+ist für die Datenbank ein Named Volume zuverlässiger als ein Host-Bind-Mount.
+
+---
+
 ## Konfiguration
 
 Alle Einstellungen haben Standardwerte und lassen sich über Umgebungsvariablen
@@ -192,4 +220,3 @@ uv run pytest
 - `GET /sites/{id}/checks` — jüngster Prüfverlauf
 - `GET /sites/{id}/stats` — Verfügbarkeit in % und durchschnittliche Antwortzeit über einen Zeitraum
 - Unit-Tests für `check_site` mit `httpx.MockTransport`
-- Docker-Image
