@@ -128,13 +128,26 @@ docker run --rm -v ./data:/app/data uptime-monitor python -m app.installation
 Запустить сервис (пробрасываем порт 8000 и том `./data`):
 
 ```bash
-docker run -d -p 8000:8000 -v ./data:/app/data --name uptime uptime-monitor
+docker run -d -p 8000:8000 -v ./data:/app/data --restart unless-stopped --name uptime uptime-monitor
 ```
 
-Открой http://127.0.0.1:8000/docs. Логи — `docker logs -f uptime`, остановка —
+Открой http://127.0.0.1:8000/docs. Логи - `docker logs -f uptime`, остановка -
 `docker stop uptime`. База лежит в томе `./data` (через `DATABASE_URL`), поэтому
-переживает перезапуск и удаление контейнера. На Docker Desktop (Windows/macOS) для
-базы named volume надёжнее, чем bind mount на папку хоста.
+переживает перезапуск и удаление контейнера. Named volume
+(`-v uptime-db:/app/data`) работает так же; bind mount выбран, чтобы файл базы
+оставался виден с хоста.
+
+### На Windows через WSL2
+
+Проверено на Docker Engine, установленном внутри дистрибутива WSL2, без Docker
+Desktop: сборка, сервис и запись планировщика в SQLite через bind mount работают,
+проброшенный порт доступен из Windows по адресу `127.0.0.1:8000`.
+
+Одна особенность: WSL2 выключает свою виртуальную машину, когда её никто не
+использует, и контейнер останавливается вместе с ней. `--restart unless-stopped`
+поднимает контейнер сразу, как только снова запускаются дистрибутив и
+`docker.service`, поэтому данные не теряются. Для непрерывной работы держи
+открытой сессию WSL.
 
 ---
 

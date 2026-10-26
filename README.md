@@ -128,13 +128,26 @@ docker run --rm -v ./data:/app/data uptime-monitor python -m app.installation
 Run the service (maps port 8000 and the `./data` volume):
 
 ```bash
-docker run -d -p 8000:8000 -v ./data:/app/data --name uptime uptime-monitor
+docker run -d -p 8000:8000 -v ./data:/app/data --restart unless-stopped --name uptime uptime-monitor
 ```
 
 Open http://127.0.0.1:8000/docs. Follow logs with `docker logs -f uptime`, stop with
 `docker stop uptime`. The database lives in the `./data` volume (via `DATABASE_URL`),
-so it survives container restarts and removal. On Docker Desktop (Windows/macOS) a
-named volume is more reliable for the database than a host bind mount.
+so it survives container restarts and removal. A named volume
+(`-v uptime-db:/app/data`) works just as well; the bind mount is used here to keep
+the database file visible from the host.
+
+### On Windows with WSL2
+
+Verified against Docker Engine installed inside a WSL2 distribution, without Docker
+Desktop: the build, the service and the scheduler writing to SQLite through the bind
+mount all work, and the published port is reachable from Windows at
+`127.0.0.1:8000`.
+
+One caveat: WSL2 shuts its virtual machine down once nothing is using it, and the
+container stops along with it. `--restart unless-stopped` brings the container back
+as soon as the distribution and `docker.service` start again, so no data is lost.
+For continuous operation keep a WSL session open.
 
 ---
 
